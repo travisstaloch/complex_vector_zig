@@ -19,7 +19,7 @@ fn cx_cmp(a: Cx, b: Cx) bool {
     return math.approxEq(f64, a.re, b.re, eps) and math.approxEq(f64, a.im, b.im, eps);
 }
 
-fn cxs_cmp(a: []Cx, b: []Cx) bool {
+fn cxs_cmp(a: []const Cx, b: []const Cx) bool {
     assert(a.len == b.len);
     var i = usize(0);
     while (i < a.len): (i+=1) {
@@ -158,18 +158,7 @@ test "det / cramer" {
     ));
 }
 
-test "intersect" {
-    // var expected = [_]Cx{cx(14.03953970842, 0), cx(9.960460291580, 0) };
-    var expected = [_]Cx{cx(12, 0), cx(12, 0) };
-    // obs_point = x_prime * x_prime_vec + y_prime * y_prime_vec + obs_origin
-    var obs_point = cplx.cvec_add(
-        cplx.cvec_add(
-            // cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 1.7), // x_prime * x_prime_vec
-            // cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 2)), 
-            cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 2), // x_prime * x_prime_vec
-            cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 0)), 
-        cvecc(12, 0, 0, 0, 0, 0));
-    
+fn test_intersect(obs_point: CVec, expected: [2]Cx) void {
     assert(
         cxs_cmp(
             cplx.intersect(
@@ -180,5 +169,25 @@ test "intersect" {
                 cvecc(-1, 0, 0, 0, 0, 0))[0..],
             expected[0..])
     );
+}
+
+test "intersect" {
+    var expected = [_]Cx{cx(14.03953970842, 0), cx(9.960460291580, 0) };
+    // obs_point = x_prime * x_prime_vec + y_prime * y_prime_vec + obs_origin
+    var obs_point = cplx.cvec_add(
+        cplx.cvec_add(
+            cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 1.7), // x_prime * x_prime_vec
+            cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 2)), 
+        cvecc(12, 0, 0, 0, 0, 0));
+
+    var expected2 = [_]Cx{cx(12, 0), cx(12, 0) };
+    var obs_point2 = cplx.cvec_add(
+        cplx.cvec_add(
+            cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 2), // x_prime * x_prime_vec
+            cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 0)), 
+        cvecc(12, 0, 0, 0, 0, 0));
+    
+    test_intersect(obs_point, expected);
+    test_intersect(obs_point2, expected2);
 }
 // zig fmt: on

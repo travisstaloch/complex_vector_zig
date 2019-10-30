@@ -1,5 +1,9 @@
 ### An educational port of https://github.com/blastwave/lastmiles complex_vector code from c to zig
-
+test:
+```bash 
+$ zig test src/test.zig 
+All tests passed. 
+```
 ### Similar Projects
  - https://github.com/jlcarr/ComplexLinearAlgebra/blob/master/clinalg.c
 
