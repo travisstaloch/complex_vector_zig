@@ -8,6 +8,7 @@ const Cx = common.Cx;
 const CVec = common.CVec;
 const cx = common.Cx.new;
 const cvec = common.CVec.new;
+const cvecc = common.cvecc;
 const Op = common.Op;
 const eps = common.eps;
 const cplx = @import("complex.zig");
@@ -18,18 +19,17 @@ fn cx_cmp(a: Cx, b: Cx) bool {
     return math.approxEq(f64, a.re, b.re, eps) and math.approxEq(f64, a.im, b.im, eps);
 }
 
+fn cxs_cmp(a: []Cx, b: []Cx) bool {
+    assert(a.len == b.len);
+    var i = usize(0);
+    while (i < a.len): (i+=1) {
+        if (!cx_cmp(a[i], b[i])) { return false; }
+    }
+    return true;
+}
+
 fn cvec_cmp(v: CVec, w: CVec) bool {
     return cx_cmp(v.x, w.x) and cx_cmp(v.y, w.y) and cx_cmp(v.z, w.z);
-}
-
-const cx_fmt = "{d:.4} + {d:.4}im ";
-
-fn cx_print(a: Cx) void {
-    warn(cx_fmt ++ "\n", a.re, a.im);
-}
-
-fn cx_str(a: Cx, buf: []u8) ![]u8 {
-    return try std.fmt.bufPrint(buf, cx_fmt, a.re, a.im);
 }
 
 // check if op(a, b) == r
@@ -89,6 +89,7 @@ test "sq / sqrt / cbrt" {
     assert(cx_cmp(roots3[2], cx(1, -2)));
 }
 
+// zig fmt: off
 var v1: CVec = undefined;
 test "vec mag / dot / cross / normalize" {
     v1 = CVec{ .x = cx(1, 1), .y = cx(2, 2), .z = cx(3, 3) };
@@ -156,3 +157,28 @@ test "det / cramer" {
            cx(-4.056939501779e-02,-4.001779359431e-01)),
     ));
 }
+
+test "intersect" {
+    // var expected = [_]Cx{cx(14.03953970842, 0), cx(9.960460291580, 0) };
+    var expected = [_]Cx{cx(12, 0), cx(12, 0) };
+    // obs_point = x_prime * x_prime_vec + y_prime * y_prime_vec + obs_origin
+    var obs_point = cplx.cvec_add(
+        cplx.cvec_add(
+            // cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 1.7), // x_prime * x_prime_vec
+            // cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 2)), 
+            cplx.cvec_scale(cvecc(0, 0, 1, 0, 0, 0), 2), // x_prime * x_prime_vec
+            cplx.cvec_scale(cvecc(0, 0, 0, 0, 1, 0), 0)), 
+        cvecc(12, 0, 0, 0, 0, 0));
+    
+    assert(
+        cxs_cmp(
+            cplx.intersect(
+                cvecc(0, 0, 0, 0, 0, 0), 
+                cvecc(0, 0, 0, 0, 0, 0), 
+                cvecc(5, 0, 2, 0, 6, 0), 
+                obs_point,
+                cvecc(-1, 0, 0, 0, 0, 0))[0..],
+            expected[0..])
+    );
+}
+// zig fmt: on
