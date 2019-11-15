@@ -21,9 +21,11 @@ fn cx_cmp(a: Cx, b: Cx) bool {
 
 fn cxs_cmp(a: []const Cx, b: []const Cx) bool {
     assert(a.len == b.len);
-    var i = usize(0);
-    while (i < a.len): (i+=1) {
-        if (!cx_cmp(a[i], b[i])) { return false; }
+    var i = @as(usize, 0);
+    while (i < a.len) : (i += 1) {
+        if (!cx_cmp(a[i], b[i])) {
+            return false;
+        }
     }
     return true;
 }
@@ -189,5 +191,13 @@ test "intersect" {
     
     test_intersect(obs_point, expected);
     test_intersect(obs_point2, expected2);
+}
+
+test "as_array" {
+    const v = cvecc(1, 0, 2, 0, 3, 0);
+    const arr = v.as_array();
+    assert(cx_cmp(arr[0], v.x));
+    assert(cx_cmp(arr[1], v.y));
+    assert(cx_cmp(arr[2], v.z));
 }
 // zig fmt: on

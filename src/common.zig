@@ -13,10 +13,13 @@ pub const CVec = struct {
     z: Cx,
     const Self = @This();
     pub fn new(x: Cx, y: Cx, z: Cx) Self {
-       return Self {.x = x, .y = y, .z = z};
+        return Self{ .x = x, .y = y, .z = z };
     }
     pub fn create(a: f64, b: f64, c: f64, d: f64, e: f64, f: f64) Self {
-       return Self {.x = cx(a, b), .y = cx(c,d), .z = cx(e,f)};
+        return Self{ .x = cx(a, b), .y = cx(c, d), .z = cx(e, f) };
+    }
+    pub fn as_array(self: Self) [3]Cx {
+        return @bitCast([3]Cx, self);
     }
 };
 
@@ -28,7 +31,7 @@ pub const Op = enum {
 };
 
 // pub fn cxs(args: ...) []Cx {
-//         comptime var i = usize(0);
+//         comptime var i = @as(usize, 0);
 //         comptime var l = args.len / 2;
 //         comptime var arr: [l]Cx = undefined;
 //         comptime {
